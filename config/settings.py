@@ -18,34 +18,32 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-simpleshop-dev-key-change-
 
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-# Allowed Hosts configuration (supports local development and Cloud Run)
-default_hosts = [
+# Allowed Hosts configuration for local development and Cloud Run
+ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "ecommerce-gcp-733413941795.europe-west1.run.app",
-    "testserver",
 ]
-allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '')
+
+# If an environment variable is set for ALLOWED_HOSTS, merge additional hosts
+# while ensuring the required Cloud Run hostname and localhost are preserved
+allowed_hosts_env = os.getenv("ALLOWED_HOSTS")
 if allowed_hosts_env:
-    ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(',') if h.strip()]
-    for host in default_hosts:
+    for host in [h.strip() for h in allowed_hosts_env.split(",") if h.strip()]:
         if host not in ALLOWED_HOSTS:
             ALLOWED_HOSTS.append(host)
-else:
-    ALLOWED_HOSTS = default_hosts
 
 # CSRF Trusted Origins for Cloud Run
-default_csrf_trusted = [
+CSRF_TRUSTED_ORIGINS = [
     "https://ecommerce-gcp-733413941795.europe-west1.run.app",
 ]
-csrf_trusted_env = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+
+# If an environment variable is set for CSRF_TRUSTED_ORIGINS, merge additional origins
+csrf_trusted_env = os.getenv("CSRF_TRUSTED_ORIGINS")
 if csrf_trusted_env:
-    CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_trusted_env.split(',') if origin.strip()]
-    for origin in default_csrf_trusted:
+    for origin in [o.strip() for o in csrf_trusted_env.split(",") if origin.strip()]:
         if origin not in CSRF_TRUSTED_ORIGINS:
             CSRF_TRUSTED_ORIGINS.append(origin)
-else:
-    CSRF_TRUSTED_ORIGINS = default_csrf_trusted
 
 # Application definition
 INSTALLED_APPS = [
