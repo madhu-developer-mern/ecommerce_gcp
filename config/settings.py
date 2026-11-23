@@ -18,10 +18,34 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-simpleshop-dev-key-change-
 
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-allowed_hosts_env = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver')
-ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(',') if h.strip()]
-if 'testserver' not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append('testserver')
+# Allowed Hosts configuration (supports local development and Cloud Run)
+default_hosts = [
+    "localhost",
+    "127.0.0.1",
+    "ecommerce-gcp-733413941795.europe-west1.run.app",
+    "testserver",
+]
+allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '')
+if allowed_hosts_env:
+    ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(',') if h.strip()]
+    for host in default_hosts:
+        if host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(host)
+else:
+    ALLOWED_HOSTS = default_hosts
+
+# CSRF Trusted Origins for Cloud Run
+default_csrf_trusted = [
+    "https://ecommerce-gcp-733413941795.europe-west1.run.app",
+]
+csrf_trusted_env = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+if csrf_trusted_env:
+    CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_trusted_env.split(',') if origin.strip()]
+    for origin in default_csrf_trusted:
+        if origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(origin)
+else:
+    CSRF_TRUSTED_ORIGINS = default_csrf_trusted
 
 # Application definition
 INSTALLED_APPS = [
@@ -129,6 +153,18 @@ SIMPLE_JWT = {
 }
 
 # CORS Configuration
-cors_env = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173')
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_env.split(',') if origin.strip()]
+default_cors_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://ecommerce-gcp-733413941795.europe-west1.run.app",
+]
+cors_env = os.getenv('CORS_ALLOWED_ORIGINS', '')
+if cors_env:
+    CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_env.split(',') if origin.strip()]
+    for origin in default_cors_origins:
+        if origin not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(origin)
+else:
+    CORS_ALLOWED_ORIGINS = default_cors_origins
+
 CORS_ALLOW_CREDENTIALS = True
