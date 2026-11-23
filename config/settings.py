@@ -33,8 +33,10 @@ if allowed_hosts_env:
         if host not in ALLOWED_HOSTS:
             ALLOWED_HOSTS.append(host)
 
-# CSRF Trusted Origins for Cloud Run
+# CSRF Trusted Origins for Firebase Hosting and Cloud Run
 CSRF_TRUSTED_ORIGINS = [
+    "https://ecommerce-c34ed.web.app",
+    "https://ecommerce-c34ed.firebaseapp.com",
     "https://ecommerce-gcp-733413941795.europe-west1.run.app",
 ]
 
@@ -150,19 +152,18 @@ SIMPLE_JWT = {
     'USER_ID_CLAIM': 'user_id',
 }
 
-# CORS Configuration
-default_cors_origins = [
+# CORS Configuration for Firebase Hosting and Local Development
+CORS_ALLOWED_ORIGINS = [
+    "https://ecommerce-c34ed.web.app",
+    "https://ecommerce-c34ed.firebaseapp.com",
     "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://ecommerce-gcp-733413941795.europe-west1.run.app",
 ]
-cors_env = os.getenv('CORS_ALLOWED_ORIGINS', '')
+
+# If an environment variable is set for CORS_ALLOWED_ORIGINS, merge additional origins
+cors_env = os.getenv("CORS_ALLOWED_ORIGINS")
 if cors_env:
-    CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_env.split(',') if origin.strip()]
-    for origin in default_cors_origins:
+    for origin in [o.strip() for o in cors_env.split(",") if o.strip()]:
         if origin not in CORS_ALLOWED_ORIGINS:
             CORS_ALLOWED_ORIGINS.append(origin)
-else:
-    CORS_ALLOWED_ORIGINS = default_cors_origins
 
 CORS_ALLOW_CREDENTIALS = True
