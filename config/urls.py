@@ -18,9 +18,22 @@ def health_check(request):
         "service": "simpleshop-backend"
     })
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def version_check(request):
+    """
+    Version check API endpoint for Cloud Run revision testing and canary deployments.
+    """
+    return Response({
+        "version": "v2",
+        "environment": "production",
+        "service": "ecommerce-gcp"
+    })
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/health/', health_check, name='health-check'),
+    path('api/version/', version_check, name='version-check'),
     path('api/auth/', include('users.urls')),
     path('api/products/', include('products.urls')),
     path('api/orders/', include('orders.urls')),
